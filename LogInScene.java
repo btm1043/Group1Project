@@ -119,11 +119,11 @@ public class LogInScene {
 	}
 
 	public void promptError(Stage stage, String header, String content) {
-		Alert failedLogIn = new Alert(AlertType.ERROR);
-		failedLogIn.initOwner(stage);
-		failedLogIn.setHeaderText(header);
-		failedLogIn.setContentText(content);
-		failedLogIn.showAndWait();
+		Alert error = new Alert(AlertType.ERROR);
+		error.initOwner(stage);
+		error.setHeaderText(header);
+		error.setContentText(content);
+		error.showAndWait();
 	}
 	
 	public GridPane getLogOnPad() {
