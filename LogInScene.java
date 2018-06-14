@@ -40,10 +40,10 @@ public class LogInScene {
 		DropShadow shadow = new DropShadow();
 		numPad.setAlignment(Pos.BOTTOM_CENTER);
 		String[] keyText = {
-				"1", "2", "3",
-				"4", "5", "6",
-				"7", "8", "9",
-				"Clear", "0", "Enter"
+			"1", "2", "3",
+			"4", "5", "6",
+			"7", "8", "9",
+			"Clear", "0", "Enter"
 		};
 		Label bigTitle = new Label();
 		bigTitle.setFont(Font.font ("Verdana", 100));
