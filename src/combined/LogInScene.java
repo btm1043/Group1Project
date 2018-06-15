@@ -20,30 +20,32 @@ import javafx.stage.Stage;
 public class LogInScene {
 	private static final int defaultUser = 132451;
 	private static final int defaultPIN = 1111;
-	private static String logInPrompt = "Please enter your log-in number.";
-	private static String pinPrompt = "Please enter your PIN.";
-	private Rectangle2D screen = Screen.getPrimary().getVisualBounds();
-	private double screenWidth = screen.getWidth();
-	private double screenHeight = screen.getHeight();
+	private static final String logInPrompt = "Please enter your log-in number.";
+	private static final String pinPrompt = "Please enter your PIN.";
+	private Rectangle2D screen;
+	private double screenWidth;
+	private double screenHeight;
 	private int user;
 	private int pin;
 	private Scene loginScene;
-	private GridPane pad;
 
 	public LogInScene(Stage stage, Scene scene) {
-		pad = makeLogOnPad(stage, scene);
+		screen = Screen.getPrimary().getVisualBounds();
+		screenWidth = screen.getWidth();
+		screenHeight = screen.getHeight();
+		GridPane pad = makeLogOnPad(stage, scene);
 		loginScene = new Scene(pad);
 	}
 	
-	GridPane makeLogOnPad(Stage stage, Scene scene) {
+	private GridPane makeLogOnPad(Stage stage, Scene scene) {
 		GridPane numPad = new GridPane();
 		DropShadow shadow = new DropShadow();
 		numPad.setAlignment(Pos.BOTTOM_CENTER);
 		String[] keyText = {
-				"1", "2", "3",
-				"4", "5", "6",
-				"7", "8", "9",
-				"Clear", "0", "Enter"
+			"1", "2", "3",
+			"4", "5", "6",
+			"7", "8", "9",
+			"Clear", "0", "Enter"
 		};
 		Label bigTitle = new Label();
 		bigTitle.setFont(Font.font ("Verdana", 100));
@@ -90,54 +92,45 @@ public class LogInScene {
 							} catch (NumberFormatException err) {
 								promptError(stage, "Wrong Format", "Please only enter integers.");
 							}
-							
 						} else {
 							try {
 								pin = Integer.parseInt(fieldText);
-								boolean success = logIn();
+								boolean success = lookUp();
 								if (!success) {
 									promptError(stage, "Login ID does not match with PIN!", "Please re-enter your login ID and PIN.");
 									input.setPromptText(logInPrompt);
 								} else {
 									stage.setScene(scene);
-									stage.setFullScreen(true);
+									stage.show();
 								}
 							} catch (NumberFormatException err) {
 								promptError(stage, "Wrong Format", "Please only enter integer.");
-							}
-							
-							
+							}						
 						}
 						fieldText = "";
-						input.setText("");
-						
-					}
-					
+						input.setText("");				
+					}				
 				}
 			});
 			numPad.add(b, i%3, (int) Math.ceil(i/3) + 2);
 		}
 		return numPad;
 	}
-
-	public void promptError(Stage stage, String header, String content) {
-		Alert error = new Alert(AlertType.ERROR);
-		error.initOwner(stage);
-		error.setHeaderText(header);
-		error.setContentText(content);
-		error.showAndWait();
+	
+	private boolean lookUp() {
+		if (user == defaultUser && pin == defaultPIN)
+			return true;
+		
+		Database db = new Database();
+		return db.checkUser(user);
 	}
 	
-	public GridPane getLogOnPad() {
-		return pad;
-	}
-	
-	public boolean logIn() {
-		return (user == defaultUser && pin == defaultPIN) || lookUp();
-	}
-	
-	public boolean lookUp() {
-		return false;
+	private void promptError(Stage stage, String header, String content) {
+		Alert failedLogIn = new Alert(AlertType.ERROR);
+		failedLogIn.initOwner(stage);
+		failedLogIn.setHeaderText(header);
+		failedLogIn.setContentText(content);
+		failedLogIn.showAndWait();
 	}
 	
 	public Scene getScene() {
