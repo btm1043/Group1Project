@@ -120,7 +120,7 @@ public class LogInScene {
 			return true;
 		
 		Database db = new Database();
-		return db.checkUser(user, pin);
+		return db.checkUser(user);
 	}
 	
 	private void promptError(Stage stage, String header, String content) {
