@@ -100,6 +100,7 @@ public class LogInScene {
 									promptError(stage, "Login ID does not match with PIN!", "Please re-enter your login ID and PIN.");
 									input.setPromptText(logInPrompt);
 								} else {
+									input.setPromptText(logInPrompt);
 									stage.setScene(scene);
 									stage.show();
 								}
