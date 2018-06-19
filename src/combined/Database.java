@@ -6,14 +6,38 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class Database {
-	private String serverIP = "localhost";
-	private String serverUser = "root";
-	private String serverPass = "gators";
-	private String serverName = "pos";
-	private String driver = "com.mysql.cj.jdbc.Driver";
-	private String url = "jdbc:mysql://" + serverIP + ":3306/" + serverName + "?autoReconnect=true&useSSL=false";
+	private static String serverIP = "localhost";
+	private static String serverUser = "root";
+	private static String serverPass = "gators";
+	private static String serverName = "pos";
+	private static String driver = "com.mysql.cj.jdbc.Driver";
+	private static String url = "jdbc:mysql://" + serverIP + ":3306/" + serverName + "?autoReconnect=true&useSSL=false";
 	
-	public boolean addUser(int user, int pin, int type) {
+	public static void setIP(String ip) {
+		serverIP = ip;
+	}
+	
+	public static void setUser(String user) {
+		serverUser = user;
+	}
+	
+	public static void setPass(String pass) {
+		serverPass = pass;
+	}
+	
+	public static void setName(String name) {
+		serverName = name;
+	}
+	
+	public static void setURL() {
+		url = "jdbc:mysql://" + serverIP + ":3306/" + serverName + "?autoReconnect=true&useSSL=false";
+	}
+	
+	public static void setURL(String newURL) {
+		url = newURL;
+	}
+	
+	public static boolean addUser(int user, int pin, int type) {
 		if (type < 0 || type > 1) {
 			System.out.println("Please enter a 1 for a manager user, or a 0 for a normal user.");
 			return false;
@@ -38,7 +62,7 @@ public class Database {
 		}
 	}
 	
-	public boolean removeUser(int user) {
+	public static boolean removeUser(int user) {
 		if (!checkUser(user)) {
 			System.out.println("User not found: " + user);
 			return false;
@@ -56,7 +80,7 @@ public class Database {
 		return false;
 	}
 	
-	public boolean setType(int user, int newType) {
+	public static boolean setType(int user, int newType) {
 		if (!checkUser(user)) {
 			System.out.println("User not found: " + user);
 			return false;
@@ -79,7 +103,7 @@ public class Database {
 		}
 	}
 	
-	public int getType(int user) {
+	public static int getType(int user) {
 		try {
 			Connection con = getConnection();
 			String query = "SELECT * FROM users WHERE user=?";
@@ -99,7 +123,7 @@ public class Database {
 		}
 	}
 	
-	public boolean checkUser(int user) {
+	public static boolean checkUser(int user) {
 		
 		try {
 			Connection con = getConnection();
@@ -126,7 +150,7 @@ public class Database {
 		} 
 	}
 	
-	private Connection getConnection() {
+	private static Connection getConnection() {
 		try {
 			Class.forName(driver);
 			Connection con = DriverManager.getConnection(url, serverUser, serverPass);
@@ -136,5 +160,7 @@ public class Database {
 			return null;
 		}
 	}
+	
+	
 
 }

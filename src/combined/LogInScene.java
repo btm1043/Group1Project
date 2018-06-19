@@ -84,11 +84,13 @@ public class LogInScene {
 					} else if (buttonText.equals("Clear")) {
 						fieldText = "";
 						input.setText("");
+						input.requestFocus();
 					} else if (input.getText().length() > 0) {
 						if(input.getPromptText().equals(logInPrompt)) {
 							try {
 								user = Integer.parseInt(fieldText);
 								input.setPromptText(pinPrompt);
+								input.requestFocus();
 							} catch (NumberFormatException err) {
 								promptError(stage, "Wrong Format", "Please only enter integers.");
 							}
@@ -99,8 +101,10 @@ public class LogInScene {
 								if (!success) {
 									promptError(stage, "Login ID does not match with PIN!", "Please re-enter your login ID and PIN.");
 									input.setPromptText(logInPrompt);
+									input.requestFocus();
 								} else {
 									input.setPromptText(logInPrompt);
+									input.requestFocus();
 									stage.setScene(scene);
 									stage.show();
 								}
@@ -122,8 +126,7 @@ public class LogInScene {
 		if (user == defaultUser && pin == defaultPIN)
 			return true;
 		
-		Database db = new Database();
-		return db.checkUser(user);
+		return Database.checkUser(user);
 	}
 	
 	private void promptError(Stage stage, String header, String content) {
