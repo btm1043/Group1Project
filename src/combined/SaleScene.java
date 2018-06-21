@@ -8,6 +8,7 @@ package combined;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,21 +19,33 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javax.swing.*;
 
 /**
  *
  * @author Bryant
  */
+//Class to customize sale button screen
+
+
+
+
+
+
 public class SaleScene{
     private Scene Sscene;
     private Stage pStage;
     private MenuBar mainmenu;
+    TextArea ledgerT= new TextArea();
+    TextField totalF= new TextField();
     
     
     public SaleScene(Stage primaryStage, MenuBar menu) 
@@ -41,6 +54,7 @@ public class SaleScene{
         mainmenu=menu;
         BorderPane SaleS= buildSS(menu);
         Sscene = new Scene(SaleS,1000,700);
+        
     }
     
     
@@ -56,7 +70,7 @@ public class SaleScene{
         category.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         ledger.add(category, 0, 0); 
         
-        TextArea ledgerT= new TextArea();
+        
         ledgerT.setMaxSize(330, 500);
         ledgerT.setEditable(false);
         ledger.add(ledgerT, 0, 1);
@@ -67,7 +81,7 @@ public class SaleScene{
         total.setFont(Font.font("Arial", FontWeight.BOLD, 20));;
         ledger.add(total,0,2);
         
-        TextField totalF= new TextField();
+        totalF.setText("0.00");
         ledger.add(totalF, 1, 2);
         
         Button complete = new Button();
@@ -107,72 +121,22 @@ public class SaleScene{
         buttonS.setVgap(10);
         buttonS.setGridLinesVisible(true);
         
-        Button btn = new Button(); btn.setPrefSize(100, 50);
-        btn.setText("Say \n'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
+        iButton bArr[]=new iButton[25];
+        int i=0;
+        int j=0;
+        int k=0;
+        while(i!=25)
+        {
+            if(j%5==0)
+            {
+                j=0;
+                k++;
             }
-        });
-        
-        Button btn1= new Button();
-        btn1.setPrefSize(100, 50);
-        Button btn2 = new Button();
-        btn2.setPrefSize(100, 50);
-        Button btn3 = new Button();
-        btn3.setPrefSize(100, 50);
-        Button btn4 = new Button(); btn4.setPrefSize(100, 50);
-        Button btn5 = new Button(); btn5.setPrefSize(100, 50);
-        Button btn6 = new Button(); btn6.setPrefSize(100, 50);
-        Button btn7 = new Button(); btn7.setPrefSize(100, 50);
-        Button btn8 = new Button(); btn8.setPrefSize(100, 50);
-        Button btn9 = new Button(); btn9.setPrefSize(100, 50);
-        Button btn10 = new Button(); btn10.setPrefSize(100, 50);
-        Button btn11 = new Button(); btn11.setPrefSize(100, 50);
-        Button btn12 = new Button(); btn12.setPrefSize(100, 50);
-        Button btn13 = new Button(); btn13.setPrefSize(100, 50);
-        Button btn14 = new Button(); btn14.setPrefSize(100, 50);
-        Button btn15 = new Button(); btn15.setPrefSize(100, 50);
-        Button btn16 = new Button(); btn16.setPrefSize(100, 50);
-        Button btn17 = new Button(); btn17.setPrefSize(100, 50);
-        Button btn18 = new Button(); btn18.setPrefSize(100, 50);
-        Button btn19 = new Button(); btn19.setPrefSize(100, 50);
-        Button btn20 = new Button(); btn20.setPrefSize(100, 50);
-        Button btn21 = new Button(); btn21.setPrefSize(100, 50);
-        Button btn22 = new Button(); btn22.setPrefSize(100, 50);
-        Button btn23 = new Button(); btn23.setPrefSize(100, 50);
-        Button btn24 = new Button(); btn24.setPrefSize(100, 50);
-        
-        buttonS.add(btn, 0, 0);
-        buttonS.add(btn1, 0, 1);
-        buttonS.add(btn2, 0, 2);
-        buttonS.add(btn3, 0, 3);
-        buttonS.add(btn4, 0, 4);
-        buttonS.add(btn5, 1, 0);
-        buttonS.add(btn6, 1, 1);
-        buttonS.add(btn7, 1, 2);
-        buttonS.add(btn8, 1, 3);
-        buttonS.add(btn9, 1, 4);
-        buttonS.add(btn10, 2, 0);
-        buttonS.add(btn11, 2, 1);
-        buttonS.add(btn12, 2, 2);
-        buttonS.add(btn13, 2, 3);
-        buttonS.add(btn14, 2, 4);
-        buttonS.add(btn15, 3, 0);
-        buttonS.add(btn16, 3, 1);
-        buttonS.add(btn17, 3, 2);
-        buttonS.add(btn18, 3, 3);
-        buttonS.add(btn19, 3, 4);
-        buttonS.add(btn20, 4, 0);
-        buttonS.add(btn21, 4, 1);
-        buttonS.add(btn22, 4, 2);
-        buttonS.add(btn23, 4, 3);
-        buttonS.add(btn24, 4, 4);
-        
-        
-        
+            bArr[i]=new iButton();
+            buttonS.add(bArr[i].btn,j,k);
+            i++;
+            j++;
+        }
         
         return buttonS;
     }
@@ -211,4 +175,112 @@ public class SaleScene{
 	return Sscene;
     }
 
+
+
+    class iButton
+    {
+        //Private variable
+        private String title;
+        private double price;
+        private int quantity;
+        public Button btn;
+
+        //Default constructor
+        public iButton()
+        {
+            title="Default";
+            price=0.00;
+            quantity=0;
+            btn=new Button();
+            btn.setText(title);
+            btn.setPrefSize(100, 50);
+            btn.setOnMouseClicked(new EventHandler<MouseEvent>(){
+
+                    @Override
+                    public void handle(MouseEvent event)
+                    {
+                        MouseButton b=event.getButton();
+
+                        if(b==MouseButton.SECONDARY)
+                        {
+                            JTextField titleF=new JTextField(5);
+                            JTextField priceF=new JTextField(5);
+                            JTextField quantityF=new JTextField(5);
+
+                            JPanel myPanel=new JPanel();
+                            myPanel.add(new JLabel("Product Title:"));
+                            myPanel.add(titleF);
+                            myPanel.add(Box.createHorizontalStrut(15));
+                            myPanel.add(new JLabel("Price $:"));
+                            myPanel.add(priceF);
+                            myPanel.add(Box.createHorizontalStrut(15));
+                            myPanel.add(new JLabel("Quantity:"));
+                            myPanel.add(quantityF);
+
+                            int result= JOptionPane.showConfirmDialog(null, myPanel,"Please Enter New Product",JOptionPane.OK_CANCEL_OPTION);
+                            if (result==JOptionPane.OK_OPTION)
+                            {
+                                btn.setText(titleF.getText());
+                                title=titleF.getText();
+                                price=Double.parseDouble(priceF.getText());
+                                quantity=Integer.parseInt(quantityF.getText());
+                            }
+                        }
+                        else
+                        {
+                            System.out.println("LEDGER");
+                            String out=String.format("%15s \t $%.2f \n",title,price);
+                            double outD=Double.parseDouble(totalF.getText())+price;
+                            ledgerT.setText(ledgerT.getText()+out);
+                            String outSD=String.format("%.2f",outD);
+                            totalF.setText(outSD);
+                            
+                            
+                        }
+                    }
+                });
+
+        }
+        //Constructor given variables
+        public iButton(String T,double p, int q)
+        {
+            title=T;
+            price=p;
+            quantity=q;
+
+            btn= new Button();
+            btn.setText(title);
+            btn.setPrefSize(100, 50);
+        }
+        //Title getter and setter
+        public String getTitle()
+        {
+            return title;
+        }
+        public void setTitle(String T)
+        {
+            title=T;
+            btn.setText(title);
+        }
+        //Price getter and setter
+        public double getPrice()
+        {
+            return price;
+        }
+        public void setPrice(double p)
+        {
+            price=p;
+        }
+        //Quantity getter and setter
+        public int getQuantity()
+        {
+            return quantity;
+        }
+        public void setQuantity(int q)
+        {
+            quantity=q;
+        }
+
+
+    }
 }
