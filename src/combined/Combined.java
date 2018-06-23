@@ -25,17 +25,19 @@ public class Combined extends Application
 
     public Scene logInScene;
     public Scene salesScene;
-    
+    public Scene reportsScene;
+    public Scene searchScene;
+    public MenuBar mainMenu;
     
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("POS");
-	primaryStage.setFullScreen(true);
-        MenuBar mainMenu= buildMenubar(primaryStage);
-        //reportsScene = null;
-        //searchScene = null;
-        //addNewItem = null;
-	salesScene =new SaleScene(primaryStage,mainMenu).getScene();
+	primaryStage.setMaximized(true);
+        mainMenu= buildMenubar(primaryStage);
+        salesScene =new SaleScene(primaryStage,mainMenu).getScene();
+        reportsScene = new reportsScene(primaryStage,salesScene).getScene();
+        searchScene = new Product_Search(primaryStage,salesScene).getScene();
+	
         logInScene = new LogInScene(primaryStage, salesScene).getScene();
 	primaryStage.setScene(logInScene);
 	primaryStage.show();
@@ -59,6 +61,12 @@ public class Combined extends Application
         
         Menu mR= new Menu("Reports");
         MenuItem eodR=new MenuItem("End of Day Report");
+        eodR.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                primaryStage.setScene(reportsScene);
+            }
+        });
         MenuItem wR=new MenuItem("Weekly Report");
         MenuItem sA=new MenuItem("Sales Analysis");
         MenuItem iR=new MenuItem("Inventory Report");
@@ -71,6 +79,12 @@ public class Combined extends Application
         
         Menu mI= new Menu("Inventory");
         MenuItem iI=new MenuItem("Inventory");
+        iI.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                primaryStage.setScene(searchScene);
+            }
+        });
         MenuItem eI=new MenuItem("Edit Inventory");
         mI.getItems().addAll(iI,eI);
         

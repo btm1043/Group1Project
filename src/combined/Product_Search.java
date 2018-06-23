@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package product_search;
+package combined;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,12 @@ import javafx.application.Application;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -21,17 +24,14 @@ import javafx.stage.Stage;
  *
  * @author leola
  */
-public class Product_Search extends Application {
+public class Product_Search{
     
-
+    private Scene scene;
     /**
-     * @param args the command line arguments
+     * @param primaryStage
+     * @param menu
      */
-    public static void main(String[] args) {
-        launch(args);
-    }
-    @Override
-    public void start(Stage primaryStage) {
+    public Product_Search(Stage stage,Scene scene1) {
         int height = 800;
         int width = 600;
         TableColumn<product, String> name = new TableColumn<product, String>("Name");
@@ -75,13 +75,22 @@ public class Product_Search extends Application {
         obs = FXCollections.observableList(prodList);
         
         table.setItems(obs);
-        ScrollPane root = new ScrollPane();
-        root.setContent(new VBox(searchBar, table));
-        Scene scene = new Scene(root, width, height);
         
-        primaryStage.setTitle("Search");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Button back = new Button();
+        back.setText("< Back to Home Screen");
+        back.setOnAction(new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent e) {
+            stage.setScene(scene1);
+            stage.show();
+        }
+        });
+        
+        ScrollPane root = new ScrollPane();
+        root.setContent(new VBox(searchBar, table,back));
+        scene = new Scene(root, width, height);
+        
+        
     }
     public class product{
         private  StringProperty reciptName;
@@ -114,5 +123,10 @@ public class Product_Search extends Application {
         }
         
     }
+    
+    public Scene getScene(){
+        return scene;
+    }
+    
     
 }

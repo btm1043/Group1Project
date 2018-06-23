@@ -6,17 +6,18 @@ package combined;
  * and open the template in the editor.
  */
 
-import javafx.application.Application;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
@@ -43,7 +44,6 @@ import javax.swing.*;
 public class SaleScene{
     private Scene Sscene;
     private Stage pStage;
-    private MenuBar mainmenu;
     TextArea ledgerT= new TextArea();
     TextField totalF= new TextField();
     
@@ -51,7 +51,6 @@ public class SaleScene{
     public SaleScene(Stage primaryStage, MenuBar menu) 
     {
         pStage=primaryStage;
-        mainmenu=menu;
         BorderPane SaleS= buildSS(menu);
         Sscene = new Scene(SaleS,1000,700);
         
@@ -83,7 +82,6 @@ public class SaleScene{
         
         totalF.setText("0.00");
         ledger.add(totalF, 1, 2);
-        
         Button complete = new Button();
         complete.setText("Complete Sale");
         complete.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -92,6 +90,21 @@ public class SaleScene{
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Redirect to payment screen");
+                try{
+                    FileWriter fWriter = new FileWriter("tran.txt");
+                    BufferedWriter writer = new BufferedWriter(fWriter);
+                    String out=ledgerT.getText();
+                    String separator=System.getProperty("line.separator");
+                    out=out.replace("\n", separator);
+                    writer.write(out);
+                    writer.newLine();
+                    writer.write(totalF.getText());
+                    writer.close();
+                    
+                    
+                } catch (IOException ex) {
+                    Logger.getLogger(SaleScene.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         ledger.add(complete,  0,3);
@@ -143,16 +156,6 @@ public class SaleScene{
     
     public BorderPane buildSS(MenuBar main)
     {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-                
-            }
-        });
         
         
         
@@ -161,7 +164,6 @@ public class SaleScene{
         GridPane buttonS= buildButtonS();
         
         BorderPane root = new BorderPane();
-        root.setBottom(btn);
         root.setTop(mB);
         root.setCenter(buttonS);
         root.setLeft(grid);
@@ -229,7 +231,7 @@ public class SaleScene{
                         else
                         {
                             System.out.println("LEDGER");
-                            String out=String.format("%15s \t $%.2f \n",title,price);
+                            String out=String.format("%15s\t $%.2f \n",title,price);
                             double outD=Double.parseDouble(totalF.getText())+price;
                             ledgerT.setText(ledgerT.getText()+out);
                             String outSD=String.format("%.2f",outD);
