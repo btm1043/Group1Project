@@ -29,6 +29,13 @@ public class LogInScene {
 	private int pin;
 	private Scene loginScene;
 
+
+	/**
+	 * Constructs the scene.
+	 * 
+	 * @param stage
+	 * @param scene The main screen to transition to have successful log in.
+	 */
 	public LogInScene(Stage stage, Scene scene) {
 		screen = Screen.getPrimary().getVisualBounds();
 		screenWidth = screen.getWidth();
@@ -37,6 +44,15 @@ public class LogInScene {
 		loginScene = new Scene(pad);
 	}
 	
+
+	/**
+	 * Creates the logon pad for the logon scene.
+	 * 
+	 * @param stage
+	 * @param scene Transition scene after successful log in.
+	 * 
+	 * @return Returns logon pad Gridpane.
+	 */
 	private GridPane makeLogOnPad(Stage stage, Scene scene) {
 		GridPane numPad = new GridPane();
 		DropShadow shadow = new DropShadow();
@@ -78,14 +94,14 @@ public class LogInScene {
 				public void handle(ActionEvent e) {
 					String buttonText = b.getText();
 					String fieldText = input.getText();
-					if (buttonText.length() == 1) {
+					if (buttonText.length() == 1) { // Number button
 						fieldText += buttonText;
 						input.setText(fieldText);
 					} else if (buttonText.equals("Clear")) {
 						fieldText = "";
 						input.setText("");
 						input.requestFocus();
-					} else if (input.getText().length() > 0) {
+					} else if (input.getText().length() > 0) { // Enter button
 						if(input.getPromptText().equals(logInPrompt)) {
 							try {
 								user = Integer.parseInt(fieldText);
@@ -122,6 +138,10 @@ public class LogInScene {
 		return numPad;
 	}
 	
+
+	/**
+	 * @return true if user/pin exists in DB or is default login. False otherwise
+	 */
 	private boolean lookUp() {
 		if (user == defaultUser && pin == defaultPIN)
 			return true;
@@ -129,6 +149,13 @@ public class LogInScene {
 		return Database.checkUser(user);
 	}
 	
+	/**
+	 * Small helper method to prompt error when user enters invalid data.
+	 * 
+	 * @param stage
+	 * @param header Name of the error dialogue box
+	 * @param content Error message
+	 */
 	private void promptError(Stage stage, String header, String content) {
 		Alert failedLogIn = new Alert(AlertType.ERROR);
 		failedLogIn.initOwner(stage);
@@ -137,6 +164,9 @@ public class LogInScene {
 		failedLogIn.showAndWait();
 	}
 	
+	/**
+	 * @return returns the loginscene. 
+	 */
 	public Scene getScene() {
 		return loginScene;
 	}
