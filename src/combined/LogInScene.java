@@ -146,7 +146,7 @@ public class LogInScene {
 		if (user == defaultUser && pin == defaultPIN)
 			return true;
 		
-		return Database.checkUser(user);
+		return Database.checkUser(user) && Database.getPIN(user) == pin;
 	}
 	
 	/**

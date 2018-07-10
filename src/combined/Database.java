@@ -236,6 +236,64 @@ public class Database {
 		}
 	}
 	
+	
+	/**
+	 * Gets the pin from user in user table
+	 * 
+	 * @param user The user to retrieve pin
+	 * 
+	 * @return pin of user if success, -1 otherwise
+	 */
+	public static int getPIN(int user) {
+		try {
+			Connection con = getConnection();
+			String query = "SELECT * FROM users WHERE user=?";
+			PreparedStatement st = con.prepareStatement(query);
+			st.setInt(1, user);
+			ResultSet matches = st.executeQuery();
+			if (!matches.next()) {
+				System.out.println("User not found: " + user);
+				return -1;
+			}
+			int t =  matches.getInt("pin"); 
+			con.close();
+			return t;
+		} catch (Exception e) {
+			System.out.println(e);	
+			return -1;
+		}
+	}
+	
+	/**
+	 * sets the pin of user in user table
+	 * 
+	 * @param user The user to set pin of
+	 * 
+	 * @return true if success, false otherwise 
+	 */
+	public static boolean setPIN(int user, int pin) {
+		if (!checkUser(user)) {
+			System.out.println("User not found: " + user);
+			return false;
+		}
+		if (user < 0) {
+			System.out.println("Invalid pin. pin cannot be negative!");
+			return false;
+		} 
+		try {
+			Connection con = getConnection();
+			String query = "UPDATE users SET pin = " + pin + " WHERE user=" + user;
+			PreparedStatement st = con.prepareStatement(query);
+			st.executeUpdate();
+			
+			con.close();
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
+	}
+	
 	/**
 	 * Checks to see if user is entered into DB.
 	 * 
