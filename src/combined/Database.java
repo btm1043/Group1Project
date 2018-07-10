@@ -1,17 +1,70 @@
+/**
+ * Class to handle database operations with regards to users table, inventory table, and history table. 
+ */
 package combined;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedList;
 
 public class Database {
+	
+	/**
+	 * Helper class to create an object which has all of the product parameters.  
+	 * 
+	 */
+	protected static class Entry {
+		int prodID;
+		double price;
+		int qty;
+		String cat;
+		String name;
+		
+		Entry(int prodID, double price, int qty, String cat, String name) {
+			this.prodID = prodID;
+			this.price = price;
+			this.qty = qty;
+			this.cat = cat;
+			this.name = name;
+		}
+		
+		int getID() {
+			return prodID;
+		}
+		
+		double getPrice() {
+			return price;
+		}
+		
+		int getQTY() {
+			return qty;
+		}
+		
+		String getCategory() {
+			return cat;
+		}
+		
+		String getName() {
+			return name;
+		}
+	}
+	
 	private static String serverIP = "localhost";
 	private static String serverUser = "root";
 	private static String serverPass = "gators";
 	private static String serverName = "pos";
 	private static String driver = "com.mysql.cj.jdbc.Driver";
 	private static String url = "jdbc:mysql://" + serverIP + ":3306/" + serverName + "?autoReconnect=true&useSSL=false";
+	private LinkedList<Entry> transaction;
+	
+	/**
+	 * Instantiates an empty transaction list. Currently database only needs to be instantiated when it comes to pushiing a transaction into history table.
+	 */
+	public Database() {
+		transaction = new LinkedList<Entry>();
+	}
 	
 	/**
 	 * Sets the ip of DB server
@@ -128,8 +181,8 @@ public class Database {
 	/**
 	 * Sets the user type associated with given user in user table.
 	 * 
-	 * @params user The user to alter
-	 * @params newType The new user mode
+	 * @param user The user to alter
+	 * @param newType The new user mode
 	 * 
 	 * @return true if successful, false otherwise.
 	 */
@@ -159,7 +212,7 @@ public class Database {
 	/**
 	 * Gets the user mode from user in user table
 	 * 
-	 * @params user The user to retrieve user mode
+	 * @param user The user to retrieve user mode
 	 * 
 	 * @return user mode of user (0/1), or -1 if unsuccessful 
 	 */
@@ -186,7 +239,7 @@ public class Database {
 	/**
 	 * Checks to see if user is entered into DB.
 	 * 
-	 * @params user The user to check
+	 * @param user The user to check
 	 * 
 	 * @return true if found, false otherwise
 	 */
@@ -220,11 +273,11 @@ public class Database {
 	/**
 	 * Adds a product to inventory table
 	 * 
-	 * @params id The id of the product
-	 * @params name The name of the product
-	 * @params qty Amount of product stocked
-	 * @params price The price of the product
-	 * @params category The category of the product
+	 * @param id The id of the product
+	 * @param name The name of the product
+	 * @param qty Amount of product stocked
+	 * @param price The price of the product
+	 * @param category The category of the product
 	 * 
 	 * @return true if successful, false otherwise
 	 */
@@ -274,7 +327,7 @@ public class Database {
 	/**
 	 * Removes product from inventory table completely
 	 * 
-	 * @params id the id to remove
+	 * @param id the id to remove
 	 * 
 	 * @return true if successful, false otherwise. 
 	 */
@@ -299,8 +352,8 @@ public class Database {
 	/**
 	 * Sets the quantity of a product available in the inventory table.
 	 * 
-	 * @params id The id of product to set
-	 * @params newQty The new quantity of the product
+	 * @param id The id of product to set
+	 * @param newQty The new quantity of the product
 	 * 
 	 * @return true if successful, false otherwise
 	 */
@@ -330,7 +383,7 @@ public class Database {
 	/**
 	 * Gets the quantity of product by ID
 	 * 
-	 * @params id Id of product
+	 * @param id Id of product
 	 * 
 	 * @return quantity of product left on success, -1 otherwise
 	 */
@@ -358,8 +411,8 @@ public class Database {
 	/**
 	 * Sets the price of a product
 	 * 
-	 * @params id The id of product to set
-	 * @params newPrice The new price of the product
+	 * @param id The id of product to set
+	 * @param newPrice The new price of the product
 	 * 
 	 * @return true if successful, false otherwise
 	 */
@@ -389,7 +442,7 @@ public class Database {
 	/**
 	 * Gets the price of product by ID
 	 * 
-	 * @params id Id of product
+	 * @param id Id of product
 	 * 
 	 * @return price of product, -1 otherwise
 	 */
@@ -416,7 +469,7 @@ public class Database {
 	/**
 	 * Returns the category of the product id
 	 * 
-	 * @params id The id of the product
+	 * @param id The id of the product
 	 * 
 	 * @return The category of the product id if successful, "Not found!" otherwise
 	 */
@@ -443,7 +496,7 @@ public class Database {
 	/**
 	 * Gets the name of a product
 	 * 
-	 * @params id The id of the product
+	 * @param id The id of the product
 	 * 
 	 * @returns The name of the product. "Not found!" otherwise
 	 */
@@ -500,6 +553,145 @@ public class Database {
 		} 
 	}
 
+	/**
+	 * Gets the last transaction ID
+	 * 
+	 * @return last ID on success. 0 if table is empty, -1 if error.
+	 */
+	public static int getLastTrans() {
+		try {
+			Connection con = getConnection();
+			String query = "SELECT trans FROM history where trans=(SELECT MAX(trans) FROM history)";
+			PreparedStatement st = con.prepareStatement(query);
+			ResultSet matches = st.executeQuery();
+			if (!matches.next()) {
+				System.out.println("No entry found ");
+				return 0;
+			}
+			int trans =  matches.getInt(1); 
+			con.close();
+			return trans;
+		} catch (Exception e) {
+			System.out.println(e);	
+			return -1;
+		}
+	}
+	
+	/**
+	 * Adds an entry to the transaction linked list. 
+	 * 
+	 * @param id ID of producct
+	 * @param cost Cost of prodct
+	 * @param amount Amount of prodct
+	 * @param name Name of product
+	 * @param cat Category of product
+	 */
+	public void addEntry(int id, double cost, int amount, String name, String cat ) {
+		transaction.add(new Entry(id, cost, amount, cat, name));
+	}
+	
+	
+	/**
+	 * Logs the transaction to the history table. 
+	 * 
+	 * @return true if successful, false otherwise. 
+	 */
+	public boolean logTransaction() {
+		if (transaction.size() == 0) {
+			System.out.println("Nothing to log!");
+			return false;
+		}
+		int i = transaction.size() - 1;
+		int transID = Database.getLastTrans() + 1;
+		for (;i >= 0; i--)  {
+			Entry n = transaction.removeFirst();
+			int prod = n.getID();
+			int qt = n.getQTY();
+			int available = Database.getQuantity(prod);
+			if (available == -1) 
+				System.out.println("WARNING: Item sold that is not entered in inventory. Please update inventory!!");
+			Database.setQuantity(prod, available - qt);
+			if (available > 0 && available-qt < 0)
+				System.out.println("WARNING: Sold more items than what's logged in inventory! Please update inventory!");
+			Database.addHistoryEntry(transID, prod, n.getName(), n.getPrice(), qt, n.getCategory());	
+		}
+		return true;
+	}
+	
+	/**
+	 * Empties transaction list. Use this when sale gets canceled. 
+	 */
+	public void clearSale() {
+		transaction.clear();
+	}
+	
+	/**
+	 * Adds a transaction entry to the history table. This is a helper method for when a transaction is ready to be entered. 
+	 * 
+	 * @param trans - Transaction ID to be used for lookup
+	 * @param id - Product ID to add into table
+	 * @param name - Name of product at point of purchase
+	 * @param price - Price of product paid at point of purchase
+	 * @param qty - Amount of item being bought
+	 * @param cat - Category of item at point of purchase
+	 * 
+	 * @return true on success, false otherwise.
+	 */
+	private static boolean addHistoryEntry(int trans, int id, String name, double price, int qty, String cat) {
+		if (id < 0 || name.length() == 0 || price < 0 || qty <= 0 || cat.length() == 0) {
+			System.out.println("No empty strings or negative values can go into table!");
+			return false;
+		}
+		try {
+			Connection con = getConnection();
+			String query  = "INSERT INTO history (trans, id,  name, price, qty, category) VALUES (?, ?, ?, ?, ?, ?)";
+			PreparedStatement st = con.prepareStatement(query);
+			st.setInt(1, trans);
+			st.setInt(2, id);
+			st.setString(3, name);
+			st.setDouble(4, price);
+			st.setInt(5, qty);
+			st.setString(6, cat);
+			st.execute();
+			con.close();
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
+	}
+	
+	/**
+	 * Retrieves each history entry with given transaction number
+	 * @param trans Trans ID of transction.
+	 * 
+	 * @return LinkedList with entries that match the Trans ID.
+	 */
+	public static LinkedList<Entry> getTransaction(int trans) {
+		LinkedList<Entry> record = new LinkedList<Entry>();
+		try {
+			Connection con = getConnection();
+			String query = "SELECT * FROM history WHERE trans=" + trans;
+			PreparedStatement st = con.prepareStatement(query);
+			ResultSet matches = st.executeQuery();
+			if (!matches.next()) {
+				System.out.println("No record of transaction " + trans);
+				return null;
+			}
+			do {
+				record.add(new Entry(matches.getInt(3), matches.getDouble(6), matches.getInt(5), matches.getString(7),  matches.getString(4)));
+				
+			} while (matches.next());
+			
+			con.close();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+		
+		return record;
+	}
+	
 	/**
 	 * Helper method to secure connection to DB. 
 	 */
