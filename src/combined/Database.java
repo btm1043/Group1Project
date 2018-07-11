@@ -276,7 +276,7 @@ public class Database {
 			System.out.println("User not found: " + user);
 			return false;
 		}
-		if (user < 0) {
+		if (pin < 0) {
 			System.out.println("Invalid pin. pin cannot be negative!");
 			return false;
 		} 
