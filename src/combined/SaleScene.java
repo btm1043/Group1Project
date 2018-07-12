@@ -113,7 +113,7 @@ public class SaleScene{
                     String separator=System.getProperty("line.separator");
                     out=out.replace("\n", separator);
                     writer.write(out);
-                    writer.write(totalF.getText());
+                    writer.write("$"+totalF.getText());
                     writer.close();
                     
                     
