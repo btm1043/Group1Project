@@ -46,6 +46,8 @@ public class SaleScene{
     private Stage pStage;
     TextArea ledgerT= new TextArea();
     TextField totalF= new TextField();
+    TextField stotalF= new TextField();
+    TextField taxF= new TextField();
     
     
     public SaleScene(Stage primaryStage, MenuBar menu) 
@@ -75,10 +77,24 @@ public class SaleScene{
         ledger.add(ledgerT, 0, 1);
         ledger.setColumnSpan(ledgerT,3);
         
+        Label tax= new Label();
+        tax.setText("\t \tTax: $");
+        tax.setFont(Font.font("Arial", FontWeight.BOLD, 20));;
+        ledger.add(tax,0,3);
+
+        ledger.add(taxF,1,3);
+        
+        Label stotal= new Label();
+        stotal.setText("\t \tSubTotal: $");
+        stotal.setFont(Font.font("Arial", FontWeight.BOLD, 20));;
+        ledger.add(stotal,0,2);
+        stotalF.setText("0.00");
+        ledger.add(stotalF,1,4);
+        
         Label total= new Label();
         total.setText("\t \tTotal: $");
         total.setFont(Font.font("Arial", FontWeight.BOLD, 20));;
-        ledger.add(total,0,2);
+        ledger.add(total,0,4);
         
         totalF.setText("0.00");
         ledger.add(totalF, 1, 2);
@@ -97,7 +113,6 @@ public class SaleScene{
                     String separator=System.getProperty("line.separator");
                     out=out.replace("\n", separator);
                     writer.write(out);
-                    writer.newLine();
                     writer.write(totalF.getText());
                     writer.close();
                     
@@ -105,9 +120,11 @@ public class SaleScene{
                 } catch (IOException ex) {
                     Logger.getLogger(SaleScene.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
+                pStage.setScene(new PaymentScene(pStage,Sscene).getScene());
             }
         });
-        ledger.add(complete,  0,3);
+        ledger.add(complete,  0,5);
         //ledger.setColumnSpan(complete,3);
         
         Button exit = new Button();
@@ -119,9 +136,10 @@ public class SaleScene{
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Close Program");
+                System.exit(0);
             }
         });
-        ledger.add(exit,  0,4);
+        ledger.add(exit,  0,6);
         
 
         return ledger;
@@ -231,10 +249,16 @@ public class SaleScene{
                         else
                         {
                             System.out.println("LEDGER");
-                            String out=String.format("%15s\t $%.2f \n",title,price);
+                            String out=String.format("%s\t$%.2f\n",title,price);
                             double outD=Double.parseDouble(totalF.getText())+price;
+                            double taxt=outD*.06;
+                            double tot=outD+taxt;
                             ledgerT.setText(ledgerT.getText()+out);
                             String outSD=String.format("%.2f",outD);
+                            String taxT=String.format("%.2f", taxt);
+                            String totT=String.format("%.2f", tot);
+                            taxF.setText(taxT);
+                            stotalF.setText(totT);
                             totalF.setText(outSD);
                             
                             
