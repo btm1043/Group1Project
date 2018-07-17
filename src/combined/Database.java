@@ -137,6 +137,10 @@ public class Database {
 			System.out.println("User number already exists.");
 			return false;
 		}
+		if (user < 1000 || pin < 1000) {
+			System.out.println("Please create an account with at least 4 digits for the user and pin!");
+			return false;
+		}
 		try {
 			Connection con = getConnection();
 			String query  = "INSERT INTO users (user, pin, type) VALUES (?, ?, ?)";
@@ -276,7 +280,7 @@ public class Database {
 			System.out.println("User not found: " + user);
 			return false;
 		}
-		if (pin < 0) {
+		if (user < 0) {
 			System.out.println("Invalid pin. pin cannot be negative!");
 			return false;
 		} 
@@ -619,7 +623,7 @@ public class Database {
 	public static int getLastTrans() {
 		try {
 			Connection con = getConnection();
-			String query = "SELECT trans FROM history where trans=(SELECT MAX(trans) FROM history)";
+			String query = "SELECT MAX(trans) FROM history";
 			PreparedStatement st = con.prepareStatement(query);
 			ResultSet matches = st.executeQuery();
 			if (!matches.next()) {
@@ -697,7 +701,7 @@ public class Database {
 	 */
 	private static boolean addHistoryEntry(int trans, int id, String name, double price, int qty, String cat) {
 		if (id < 0 || name.length() == 0 || price < 0 || qty <= 0 || cat.length() == 0) {
-			System.out.println("No empty strings or negative values can go into table!");
+			System.out.println("No empty strings,negative values, or zero quantities can go into table!");
 			return false;
 		}
 		try {
