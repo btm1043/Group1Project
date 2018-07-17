@@ -8,19 +8,20 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.LinkedList;
+import java.sql.Timestamp;
 
 public class Database {
 	
 	/**
-	 * Helper class to create an object which has all of the product parameters.  
+	 * Helper class to create an object which has all of the product parameters for an entry.  
 	 * 
 	 */
 	protected static class Entry {
-		int prodID;
-		double price;
-		int qty;
-		String cat;
-		String name;
+		private int prodID;
+		private double price;
+		private int qty;
+		private String cat;
+		private String name;
 		
 		Entry(int prodID, double price, int qty, String cat, String name) {
 			this.prodID = prodID;
@@ -48,6 +49,45 @@ public class Database {
 		
 		String getName() {
 			return name;
+		}
+		
+	}
+	
+	/**
+	 * Helper class to create an object which holds all of the sale related parameters.
+	 */
+	protected static class Sale {
+		private int transID;
+		private double total;
+		private String payment;
+		private String cardNum;
+		private Timestamp time;
+		Sale(int id, double tot, String paymentType, String card, Timestamp t) {
+			transID = id;
+			total = tot;
+			payment = paymentType;
+			cardNum = card;
+			time = t;
+		}
+		
+		int getTrans() {
+			return transID;
+		}
+		
+		double getTotal() {
+			return total;
+		}
+		
+		String getPayment() {
+			return payment;
+		}
+		
+		String getCard() {
+			return cardNum;
+		}
+		
+		Timestamp getTime() {
+			return time;
 		}
 	}
 	
@@ -585,7 +625,7 @@ public class Database {
 	/**
 	 * Checks to see if product is entered into inventory table
 	 * 
-	 * @params id The id of product
+	 * @param id The id of product
 	 * 
 	 * @return true if found, false otherwise.
 	 */
@@ -656,28 +696,120 @@ public class Database {
 	/**
 	 * Logs the transaction to the history table. 
 	 * 
+	 * @param cardNumber card number used to pay for transaction. Please use format ####-####-####-####
+	 * 
 	 * @return true if successful, false otherwise. 
 	 */
-	public boolean logTransaction() {
+	public boolean logTransaction(String cardNumber) {
 		if (transaction.size() == 0) {
 			System.out.println("Nothing to log!");
 			return false;
 		}
+		if (cardNumber.length () > 19) {
+			System.out.println("Card number too long: " + cardNumber.length() + " for card " + cardNumber);
+			return false;
+		}
 		int i = transaction.size() - 1;
 		int transID = Database.getLastTrans() + 1;
+		double total = 0;
 		for (;i >= 0; i--)  {
 			Entry n = transaction.removeFirst();
 			int prod = n.getID();
 			int qt = n.getQTY();
+			total += n.getPrice()*qt;
 			int available = Database.getQuantity(prod);
 			if (available == -1) 
 				System.out.println("WARNING: Item sold that is not entered in inventory. Please update inventory!!");
 			Database.setQuantity(prod, available - qt);
 			if (available > 0 && available-qt < 0)
 				System.out.println("WARNING: Sold more items than what's logged in inventory! Please update inventory!");
-			Database.addHistoryEntry(transID, prod, n.getName(), n.getPrice(), qt, n.getCategory());	
+			Database.addHistoryEntry(transID, prod, n.getName(), n.getPrice(), qt, n.getCategory());
 		}
+		addFinalSale(transID, total, cardNumber);
 		return true;
+	}
+	
+	/**
+	 * Use this function when paying with cash
+	 * @return true on success, false otherwise
+	 */
+	public boolean logTransaction() {
+		return logTransaction("");
+	}
+	
+	/*
+	 * Private method to add sum sale to final sale table
+	 */
+	private boolean addFinalSale(int transID, double total, String card) {
+		try {
+			Connection con = getConnection();
+			String query  = "INSERT INTO sale (trans, total, payment, cardnum) VALUES (?, ?, ?, ?)";
+			PreparedStatement st = con.prepareStatement(query);
+			st.setInt(1, transID);
+			st.setDouble(2, total);
+			String payment = (card.length() == 0) ? "Cash":getCard(card);
+			st.setString(3, payment);
+			st.setString(4, card);
+			st.execute();
+			con.close();
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
+	}
+	
+	/**
+	 * Small helper method to determine card type
+	 * @param card card number
+	 * @return card type
+	 */
+	private static String getCard(String card) {
+		String beg = card.substring(0, 2);
+		switch (beg) {
+		case "51":
+		case "55":
+		return "MasterCard";
+		case "34":
+		case "37":
+			return "American Express";
+		case "65":
+			return "Discover";
+		}
+		beg = card.substring(0,1);
+		if (beg.equals("4"))
+			return "Visa";
+		beg = card.substring(0,4);
+		if (beg.equals("6011"))
+			return "Discover";
+		return "UNKOWN CARD";
+	}
+	
+	
+	/**
+	 * Returns a Sale object containing the value for each field of that transaction.
+	 * @param transID ID of transaction to search
+	 * @return the sale object
+	 */
+	public static Sale getFinalSale(int transID) {
+		try {
+			Connection con = getConnection();
+			String query = "SELECT * FROM sale WHERE trans=" + transID;
+			PreparedStatement st = con.prepareStatement(query);
+			ResultSet matches = st.executeQuery();
+			Sale match;
+			if (!matches.next()) {
+				System.out.println("No record of transaction " + transID);
+				return null;
+			}
+			match = new Sale(matches.getInt("trans"), matches.getDouble("total"), matches.getString("payment"), matches.getString("cardnum"), matches.getTimestamp("time"));
+			
+			con.close();
+			return match;
+		} catch (Exception e) {
+			System.out.println(e);
+			return null;
+		}
 	}
 	
 	/**
