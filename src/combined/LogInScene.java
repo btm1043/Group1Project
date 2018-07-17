@@ -28,6 +28,9 @@ public class LogInScene {
 	private int user;
 	private int pin;
 	private Scene loginScene;
+	private Scene jumpScene;
+	private boolean managerRequested = false;
+	private boolean inherentManager = false;
 
 
 	/**
@@ -114,11 +117,31 @@ public class LogInScene {
 							try {
 								pin = Integer.parseInt(fieldText);
 								boolean success = lookUp();
-								if (!success) {
+								if (managerRequested) {
+									if (lookUp()) {
+										if (Database.getType(user) == 1) {
+											input.setPromptText(logInPrompt);
+											input.requestFocus();
+											managerRequested = false;
+											stage.setScene(jumpScene);
+											stage.show();
+										} else {
+											promptError(stage, "Access Denied", "This account does not have sufficient privileges!\n Please enter a manager's login.");
+											input.setPromptText(logInPrompt);
+											input.requestFocus();
+										}
+									} else {
+										promptError(stage, "Login ID does not match with PIN!", "Please re-enter your login ID and PIN.");
+										input.setPromptText(logInPrompt);
+										input.requestFocus();
+									}
+							    } else if (!success) {
 									promptError(stage, "Login ID does not match with PIN!", "Please re-enter your login ID and PIN.");
 									input.setPromptText(logInPrompt);
 									input.requestFocus();
 								} else {
+									if (Database.getType(user) == 1)
+										inherentManager = true;
 									input.setPromptText(logInPrompt);
 									input.requestFocus();
 									stage.setScene(scene);
@@ -136,6 +159,24 @@ public class LogInScene {
 			numPad.add(b, i%3, (int) Math.ceil(i/3) + 2);
 		}
 		return numPad;
+	}
+	
+	/**
+	 * Call this when user isn't manager, but needs to access a manager's scene. 
+	 * @param scene to be jumped to on success
+	 */
+	public void requestManager(Scene scene) {
+		managerRequested = true;
+		jumpScene = scene;
+	}
+	
+	
+	/**
+	 * If a manager logs in from the get go, they wont be prompted for permission. If a user wasn't logged in as manager, then they need a manager's log in.
+	 * @return inherent manager status
+	 */
+	public boolean managerLoggedOn() {
+		return inherentManager;
 	}
 	
 
