@@ -887,6 +887,37 @@ public class Database {
 	}
 	
 	/**
+	 * Retrieves inventory table
+	 * 
+	 * @return LinkedList with contents of inventory
+	 */
+	public static LinkedList<Entry> getInventory() {
+		LinkedList<Entry> entries = new LinkedList<Entry>();
+		try {
+			Connection con = getConnection();
+			String query = "SELECT * FROM inventory";
+			PreparedStatement st = con.prepareStatement(query);
+			ResultSet matches = st.executeQuery();
+			if (!matches.next()) {
+				System.out.println("No table found!");
+				return null;
+			}
+			do {
+				entries.add(new Entry(matches.getInt("id"), matches.getDouble("price"), matches.getInt("qty"), matches.getString("name"),  matches.getString("category")));
+				
+			} while (matches.next());
+			
+			con.close();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+		
+		return entries;
+	}
+	
+	
+	/**
 	 * Helper method to secure connection to DB. 
 	 */
 	private static Connection getConnection() {
