@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -33,10 +34,9 @@ public class Combined extends Application
     public void start(Stage primaryStage) {
         primaryStage.setTitle("POS");
 	primaryStage.setMaximized(true);
-        mainMenu= buildMenubar(primaryStage);
-        salesScene =new SaleScene(primaryStage,mainMenu).getScene();
-        reportsScene = new reportsScene(primaryStage,salesScene).getScene();
-        searchScene = new Product_Search(primaryStage,salesScene).getScene();
+        salesScene = new SaleScene(primaryStage, buildMenubar(primaryStage)).getScene();
+        reportsScene = new reportsScene(primaryStage,salesScene, buildMenubar(primaryStage)).getScene();
+        searchScene = new Product_Search(primaryStage,salesScene, buildMenubar(primaryStage)).getScene();
 	
         logInScene = new LogInScene(primaryStage, salesScene).getScene();
 	primaryStage.setScene(logInScene);

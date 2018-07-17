@@ -31,7 +31,7 @@ public class Product_Search{
      * @param primaryStage
      * @param menu
      */
-    public Product_Search(Stage stage,Scene scene1) {
+    public Product_Search(Stage stage,Scene scene1, MenuBar mB) {
         int height = 800;
         int width = 600;
         TableColumn<product, String> name = new TableColumn<product, String>("Name");
@@ -85,10 +85,12 @@ public class Product_Search{
             stage.show();
         }
         });
-        
+        BorderPane window = new BorderPane();
         ScrollPane root = new ScrollPane();
         root.setContent(new VBox(searchBar, table,back));
-        scene = new Scene(root, width, height);
+        window.setTop(mB);
+        window.setCenter(root);
+        scene = new Scene(window, width, height);
         
         
     }

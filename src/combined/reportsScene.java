@@ -10,7 +10,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.Scene;
@@ -24,9 +26,12 @@ import javafx.scene.control.CheckBox;
 public class reportsScene { 
         private Scene reportsScene;
 
-public reportsScene(Stage stage, Scene scene) {       
+public reportsScene(Stage stage, Scene scene, MenuBar mB) {       
 		GridPane pad = TransactionList(stage, scene);
-		reportsScene = new Scene(pad);
+		BorderPane main = new BorderPane();
+		main.setTop(mB);
+		main.setCenter(pad);;
+		reportsScene = new Scene(main);
     
     }
 
