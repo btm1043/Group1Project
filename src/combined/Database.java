@@ -748,7 +748,6 @@ public class Database {
 			st.setInt(1, transID);
 			st.setDouble(2, total);
 			String payment = (card.length() == 0) ? "Cash":getCard(card);
-			System.out.println("PAYMENT:" + payment);
 			st.setString(3, payment);
 			st.setString(4, card);
 			st.execute();
