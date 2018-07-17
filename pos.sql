@@ -31,7 +31,7 @@ CREATE TABLE `history` (
   `price` double NOT NULL,
   `category` char(55) NOT NULL,
   PRIMARY KEY (`count`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -67,8 +67,34 @@ CREATE TABLE `inventory` (
 
 LOCK TABLES `inventory` WRITE;
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
-INSERT INTO `inventory` VALUES (50,'soda',1,1.55,'Drink');
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sale`
+--
+
+DROP TABLE IF EXISTS `sale`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `sale` (
+  `trans` int(11) NOT NULL,
+  `total` double NOT NULL,
+  `payment` char(55) NOT NULL,
+  `card number` char(55) DEFAULT NULL,
+  `time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`trans`),
+  UNIQUE KEY `trans` (`trans`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sale`
+--
+
+LOCK TABLES `sale` WRITE;
+/*!40000 ALTER TABLE `sale` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sale` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -105,4 +131,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-07-10 15:36:04
+-- Dump completed on 2018-07-17 10:38:02
