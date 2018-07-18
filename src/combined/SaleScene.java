@@ -49,16 +49,26 @@ public class SaleScene{
     TextField stotalF= new TextField();
     TextField taxF= new TextField();
     
+    LogInScene l= Combined.logInScene;
+    boolean manager=false;
     
     public SaleScene(Stage primaryStage, MenuBar menu) 
     {
+        if(l!=null)
+        {
+            manager=true;//l.managerLoggedOn();
+        }
+        
         pStage=primaryStage;
         BorderPane SaleS= buildSS(menu);
         Sscene = new Scene(SaleS,1000,700);
         
     }
     
-    
+    public void setManager(boolean d)
+    {
+        manager=d;
+    }
     
     public GridPane buildLedger()
     {
@@ -196,7 +206,7 @@ public class SaleScene{
     }
 
 
-
+    
     class iButton
     {
         //Private variable
@@ -209,6 +219,8 @@ public class SaleScene{
         public iButton()
         {
             title="Default";
+            
+            
             price=0.00;
             quantity=0;
             btn=new Button();
@@ -221,7 +233,7 @@ public class SaleScene{
                     {
                         MouseButton b=event.getButton();
 
-                        if(b==MouseButton.SECONDARY)
+                        if(b==MouseButton.SECONDARY && manager==true)
                         {
                             JTextField titleF=new JTextField(5);
                             JTextField priceF=new JTextField(5);

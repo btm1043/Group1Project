@@ -24,22 +24,22 @@ import javafx.stage.Stage;
 public class Combined extends Application 
 {
 
-    public Scene logInScene;
-    public Scene salesScene;
-    public Scene reportsScene;
-    public Scene searchScene;
+    public static LogInScene logInScene=null;
+    public SaleScene salesScene;
+    public reportsScene reportsScene;
+    public Product_Search searchScene;
     public MenuBar mainMenu;
     
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("POS");
 	primaryStage.setMaximized(true);
-        salesScene = new SaleScene(primaryStage, buildMenubar(primaryStage)).getScene();
-        reportsScene = new reportsScene(primaryStage,salesScene, buildMenubar(primaryStage)).getScene();
-        searchScene = new Product_Search(primaryStage,salesScene, buildMenubar(primaryStage)).getScene();
+        salesScene = new SaleScene(primaryStage, buildMenubar(primaryStage));
+        reportsScene = new reportsScene(primaryStage,salesScene.getScene(), buildMenubar(primaryStage));
+        searchScene = new Product_Search(primaryStage,salesScene.getScene(), buildMenubar(primaryStage));
 	
-        logInScene = new LogInScene(primaryStage, salesScene).getScene();
-	primaryStage.setScene(logInScene);
+        logInScene = new LogInScene(primaryStage, salesScene.getScene());
+	primaryStage.setScene(logInScene.getScene());
 	primaryStage.show();
                 
     }
@@ -50,11 +50,20 @@ public class Combined extends Application
         MenuBar mB=new MenuBar();
         Menu mF= new Menu("Mode");
         MenuItem cM=new MenuItem("Cashier");
+        cM.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                primaryStage.setScene(salesScene.getScene());
+                
+            }
+        });
         MenuItem mM=new MenuItem("Manager");
         mM.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent event) {
-                primaryStage.setScene(logInScene);
+                logInScene.requestManager(salesScene.getScene());
+                primaryStage.setScene(logInScene.getScene());
+                
             }
         });
         mF.getItems().addAll(cM,mM);
@@ -64,7 +73,7 @@ public class Combined extends Application
         eodR.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent event) {
-                primaryStage.setScene(reportsScene);
+                primaryStage.setScene(reportsScene.getScene());
             }
         });
         MenuItem wR=new MenuItem("Weekly Report");
@@ -82,7 +91,7 @@ public class Combined extends Application
         iI.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent event) {
-                primaryStage.setScene(searchScene);
+                primaryStage.setScene(searchScene.getScene());
             }
         });
         MenuItem eI=new MenuItem("Edit Inventory");
