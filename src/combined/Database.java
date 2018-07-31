@@ -622,6 +622,28 @@ public class Database {
 		}
 	}
 	
+        /**
+         * Returns a ResultSet containing products fitting search criteria
+         */
+        
+        public ResultSet getProductSet(String col, String Search) {
+            ResultSet matches = null;
+            try{
+                        Connection con = getConnection();
+			String query = "SELECT * FROM inventory WHERE ?=?";
+			PreparedStatement st = con.prepareStatement(query);
+                        st.setString(1, col);
+                        st.setString(2, Search);
+			matches = st.executeQuery();
+            }
+            catch (Exception e){
+                	System.out.println(e);	
+			
+            }
+            
+            return matches;
+        }
+        
 	/**
 	 * Checks to see if product is entered into inventory table
 	 * 

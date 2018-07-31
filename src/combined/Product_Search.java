@@ -18,7 +18,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import java.sql.*;
 
 /**
  *
@@ -30,67 +32,91 @@ public class Product_Search{
     /**
      * @param primaryStage
      * @param menu
+     * 
      */
+    
+    ScrollPane root = new ScrollPane();
+    
     public Product_Search(Stage stage,Scene scene1, MenuBar mB) {
         int height = 800;
-        int width = 600;
+        int width = 800;
         TableColumn<product, String> name = new TableColumn<product, String>("Name");
-        TableColumn<product, String> number = new TableColumn<product, String>("Number");
-        TableColumn<product, String> department = new TableColumn<product, String>("Department");
-        TableColumn<product, Double> price = new TableColumn<product, Double>("Price");
+        TableColumn<product, String> number = new TableColumn<>("Number");
+        TableColumn<product, String> department = new TableColumn<>("Category");
+        TableColumn<product, Double> price = new TableColumn<>("Price");
+        TableColumn<product, Double> quant = new TableColumn<>("Quantity");
+        Button go = new Button("Go");
         TableView<product> table = new TableView();
         TextField searchBar = new TextField();
-        searchBar.setMaxHeight(100);
-        table.getColumns().setAll(name, number, department, price);
         
-        product prod1 = new product();
-        product prod2 = new product();
-        prod2.setReciptDepartment("food");
-        prod2.setReciptName("Edible stuff");
-        prod2.setReciptNumber("976530");
-        prod2.setReciptPrice(123.45);
-        prod1.setReciptDepartment("InedibleStuff");
-        prod1.setReciptName("WindWaker");
-        prod1.setReciptNumber("2345");
-        prod1.setReciptPrice(8.8);
-        table.setMaxHeight(height);
-        table.setMaxWidth(width);
+        table.setPlaceholder(new Label("Please enter an item in the search bar above"));
+        searchBar.setPromptText("Item");
+        searchBar.setMaxHeight(100);
+        go.setMaxHeight(100);
+        table.setMinWidth(width);
         table.setMinHeight(height);
-        table.setMinWidth(width); 
-        searchBar.setMinWidth(width);
+        go.setMinWidth(width/4);
+        searchBar.setMinWidth(width * 0.75);
+        table.getColumns().setAll(name, number, department, price, quant);
         
         name.setCellValueFactory(new PropertyValueFactory("reciptName"));
         number.setCellValueFactory(new PropertyValueFactory("reciptNumber"));
         department.setCellValueFactory(new PropertyValueFactory("reciptDepartment"));
         price.setCellValueFactory(new PropertyValueFactory("reciptPrice"));
-        name.setMinWidth(table.getMinWidth()/3);
-        number.setMinWidth(table.getMinWidth()/6);
-        department.setMinWidth(table.getMinWidth()/3);
-        price.setMinWidth(table.getMinWidth()/6);
+        price.setCellValueFactory(new PropertyValueFactory("reciptQuantity"));
         
-        List<product> prodList = new ArrayList<product>();
-        prodList.add(prod1);
-        prodList.add(prod2);
+        name.setMinWidth(table.getMinWidth()/4);
+        number.setMinWidth(table.getMinWidth()/4);
+        department.setMinWidth(table.getMinWidth()/4);
+        price.setMinWidth(table.getMinWidth()/8);
+        quant.setMinWidth(table.getMinWidth()/8);     
+        
+        HBox search = new HBox(searchBar, go);
+        root.setContent(new VBox(search, table));
+        scene = new Scene(root, width, height);
+        
+        display(stage);
+        
+        go.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                {try{setTable(searchBar.textProperty(), table);}catch (Exception e1){System.out.print(e1.toString());}}
+                buildScene(search, width, height, table, mB);
+                display(stage);
+            }
+        });;
+    }
+        private void buildScene(HBox search, int width, int height, TableView table, MenuBar mb)
+    {
+
+        root.setContent(new VBox(mb, search, table));
+        scene = new Scene(root, width, height);
+    }
+    
+    private void display(Stage primaryStage)
+    {
+        primaryStage.setTitle("Search");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    
+    }
+        private void setTable(StringProperty s, TableView table) throws Exception
+    {
+        List<product> prodList = new ArrayList<>();
+        ResultSet rs = Database.GetProductSet("name", s.getValue());
+        while (rs.next()){
+            product prod = new product();
+            prod.setReciptName(rs.getString("name"));
+            prod.setReciptNumber(rs.getString("id"));
+            prod.setReciptPrice(rs.getDouble("price"));
+            prod.setReciptDepartment(rs.getString("department"));
+            prodList.add(prod);
+        }
         ObservableList obs;
         obs = FXCollections.observableList(prodList);
-        
         table.setItems(obs);
+
+    }
         
-        Button back = new Button();
-        back.setText("< Back to Home Screen");
-        back.setOnAction(new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent e) {
-            stage.setScene(scene1);
-            stage.show();
-        }
-        });
-        BorderPane window = new BorderPane();
-        ScrollPane root = new ScrollPane();
-        root.setContent(new VBox(searchBar, table,back));
-        window.setTop(mB);
-        window.setCenter(root);
-        scene = new Scene(window, width, height);
         
         
     }
@@ -99,6 +125,7 @@ public class Product_Search{
         private  StringProperty reciptNumber;
         private  StringProperty reciptDepartment;
         private  DoubleProperty reciptPrice;
+        private  IntegerProperty reciptQuantity;
         public void setReciptName(String value) { reciptName().set(value); }
         public String getReciptNumber() { return reciptNumber().get(); }
         public void setReciptNumber(String value) { reciptNumber().set(value); }
@@ -114,7 +141,9 @@ public class Product_Search{
         public void setReciptDepartment(String value) { reciptDepartment().set(value); }
         public String getReciptDepartment() { return reciptDepartment().get(); }
         public void setReciptPrice(double value) { reciptPrice().set(value); }
+        public void setReciptQuantity(int value) { reciptQuantity().set(value); }
         public double getReciptPrice() { return reciptPrice().get(); }
+        public int getReciptQuantity() { return reciptQuantity().get(); }
         public StringProperty reciptDepartment() {
             if (reciptDepartment == null) reciptDepartment = new SimpleStringProperty(this, "Dept");
             return reciptDepartment;
@@ -122,6 +151,10 @@ public class Product_Search{
         public DoubleProperty reciptPrice() {
             if (reciptPrice == null) reciptPrice = new SimpleDoubleProperty(9.99);
             return reciptPrice;
+        }
+        public IntegerProperty reciptQuantity() {
+            if (reciptQuantity == null) reciptQuantity = new SimpleIntegerProperty(9);
+            return reciptQuantity;
         }
         
     }
