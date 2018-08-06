@@ -626,11 +626,11 @@ public class Database {
          * Returns a ResultSet containing products fitting search criteria
          */
         
-        public ResultSet getProductSet(String col, String Search) {
+        public static ResultSet getProductSet(String col, String Search) {
             ResultSet matches = null;
             try{
                         Connection con = getConnection();
-			String query = "SELECT * FROM inventory WHERE ?=?";
+			String query = "SELECT * FROM inventory WHERE ? CONTAINS ?";
 			PreparedStatement st = con.prepareStatement(query);
                         st.setString(1, col);
                         st.setString(2, Search);

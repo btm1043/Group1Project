@@ -48,6 +48,8 @@ public class Product_Search{
         Button go = new Button("Go");
         TableView<product> table = new TableView();
         TextField searchBar = new TextField();
+        ObservableList categories = FXCollections.observableArrayList("ID", "Category", "Name", "Price");
+        ChoiceBox<String> cbox = new ChoiceBox<String>(categories);
         
         table.setPlaceholder(new Label("Please enter an item in the search bar above"));
         searchBar.setPromptText("Item");
@@ -55,8 +57,9 @@ public class Product_Search{
         go.setMaxHeight(100);
         table.setMinWidth(width);
         table.setMinHeight(height);
+        cbox.setMinWidth(width/4);
         go.setMinWidth(width/4);
-        searchBar.setMinWidth(width * 0.75);
+        searchBar.setMinWidth(width/2);
         table.getColumns().setAll(name, number, department, price, quant);
         
         name.setCellValueFactory(new PropertyValueFactory("reciptName"));
@@ -71,7 +74,7 @@ public class Product_Search{
         price.setMinWidth(table.getMinWidth()/8);
         quant.setMinWidth(table.getMinWidth()/8);     
         
-        HBox search = new HBox(searchBar, go);
+        HBox search = new HBox(cbox, searchBar, go);
         root.setContent(new VBox(search, table));
         scene = new Scene(root, width, height);
         
@@ -79,7 +82,7 @@ public class Product_Search{
         
         go.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                {try{setTable(searchBar.textProperty(), table);}catch (Exception e1){System.out.print(e1.toString());}}
+                {try{setTable(cbox.getValue(), searchBar.textProperty(), table);}catch (Exception e1){System.out.print(e1.toString());}}
                 buildScene(search, width, height, table, mB);
                 display(stage);
             }
@@ -99,16 +102,16 @@ public class Product_Search{
         primaryStage.show();
     
     }
-        private void setTable(StringProperty s, TableView table) throws Exception
+        private void setTable(String cat, StringProperty s, TableView table) throws Exception
     {
         List<product> prodList = new ArrayList<>();
-        ResultSet rs = Database.GetProductSet("name", s.getValue());
+        ResultSet rs = Database.GetProductSet(cat.toLowerCase(), s.getValue());
         while (rs.next()){
             product prod = new product();
             prod.setReciptName(rs.getString("name"));
             prod.setReciptNumber(rs.getString("id"));
             prod.setReciptPrice(rs.getDouble("price"));
-            prod.setReciptDepartment(rs.getString("department"));
+            prod.setReciptDepartment(rs.getString("category"));
             prodList.add(prod);
         }
         ObservableList obs;

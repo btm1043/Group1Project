@@ -60,7 +60,7 @@ public class Product_Search extends Application {
         table.setMinWidth(width);
         table.setMinHeight(height);
         go.setMinWidth(width/4);
-        searchBar.setMinWidth(width * 0.75);
+        searchBar.setMinWidth(width/2);
         table.getColumns().setAll(name, number, department, price, quant);
         
         name.setCellValueFactory(new PropertyValueFactory("reciptName"));
