@@ -105,7 +105,7 @@ public class Product_Search{
         private void setTable(String cat, StringProperty s, TableView table) throws Exception
     {
         List<product> prodList = new ArrayList<>();
-        ResultSet rs = Database.GetProductSet(cat.toLowerCase(), s.getValue());
+        ResultSet rs = Database.getProductSet(cat.toLowerCase(), s.getValue());
         while (rs.next()){
             product prod = new product();
             prod.setReciptName(rs.getString("name"));
@@ -120,9 +120,11 @@ public class Product_Search{
 
     }
         
-        
-        
+            public Scene getScene(){
+        return scene;
     }
+        
+    
     public class product{
         private  StringProperty reciptName;
         private  StringProperty reciptNumber;
@@ -162,9 +164,7 @@ public class Product_Search{
         
     }
     
-    public Scene getScene(){
-        return scene;
-    }
+
     
     
 }
