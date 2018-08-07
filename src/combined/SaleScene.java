@@ -120,7 +120,9 @@ public class SaleScene{
                 try{
                     FileWriter fWriter = new FileWriter("tran.txt");
                     BufferedWriter writer = new BufferedWriter(fWriter);
-                    String out=ledgerT.getText();
+		    String heading = "*****UFL BOOKSTORE*****\n\n";
+                    String out= heading + ledgerT.getText();
+                    //String out=ledgerT.getText();
                     String separator=System.getProperty("line.separator");
                     out=out.replace("\n", separator);
                     writer.write(out);
