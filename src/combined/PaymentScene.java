@@ -231,6 +231,18 @@ public class PaymentScene
                     else if (b.getText().length() > 1)
                             b.setStyle("-fx-background-color: #FF0000; ");
                     
+		                                      if (b.getText().equals("Enter")) {  
+                                        b.setOnAction(new EventHandler<ActionEvent>(){
+                                        @Override
+                                            public void handle(ActionEvent event) {
+                                                pStage.setScene(new receiptGenerator(pStage,pScene).getScene());
+                
+                                            }
+                                
+                                        });
+                                      }	
+			
+			
                     b.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent e) {
