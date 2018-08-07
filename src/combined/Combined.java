@@ -5,6 +5,15 @@
  */
 package combined;
 
+import java.awt.Component;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -16,6 +25,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -25,10 +35,13 @@ public class Combined extends Application
 {
 
     public static LogInScene logInScene=null;
-    public SaleScene salesScene;
+    public static SaleScene salesScene;
     public reportsScene reportsScene;
     public Product_Search searchScene;
+    public PaymentScene payScene;
     public MenuBar mainMenu;
+    
+    static File selectedFile; 
     
     @Override
     public void start(Stage primaryStage) {
@@ -95,7 +108,47 @@ public class Combined extends Application
             }
         });
         MenuItem eI=new MenuItem("Edit Inventory");
-        mI.getItems().addAll(iI,eI);
+        MenuItem impt=new MenuItem("Import Inventory");
+        impt.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+                Component parent = null;
+                int result = fileChooser.showOpenDialog(parent);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    selectedFile = fileChooser.getSelectedFile();
+                    System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+                    
+                    BufferedReader br=null;
+        try {
+            br = new BufferedReader(new FileReader(selectedFile));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(PaymentScene.class.getName()).log(Level.SEVERE, null, ex);
+        }
+ 
+        String st;
+        try {
+            int i =0;
+            while ((st = br.readLine()) != null)
+            {
+                Scanner s = new Scanner(st).useDelimiter("\\t");
+                
+                
+                salesScene.bArr[i].setTitle(s.next());
+                
+                salesScene.bArr[i].setPrice(Double.parseDouble(s.next()));
+                salesScene.bArr[i].setQuantity(Integer.parseInt(s.next()));
+                i++;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(PaymentScene.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                }   
+            }
+        });
+        
+        mI.getItems().addAll(iI,eI,impt);
         
         mB.getMenus().addAll(mF,mR,mRe,mI);
         

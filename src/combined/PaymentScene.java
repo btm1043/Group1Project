@@ -12,6 +12,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -32,6 +35,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 /**
  *
@@ -142,8 +148,34 @@ public class PaymentScene
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Redirect to Sales screen");
-                File dir = new File("C:\\Users\\Bryant\\Documents\\NetBeansProjects\\Combined\\Reciepts\\test.txt");
-                pStage.setScene(og);
+                    if(Double.parseDouble(totalF.getText())==0)
+                    {
+                        if(Combined.selectedFile!=null)
+                        {
+                        FileWriter fileWriter = null;
+                        try {
+                            fileWriter = new FileWriter(Combined.selectedFile);
+                        } catch (IOException ex) {
+                            Logger.getLogger(PaymentScene.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        PrintWriter printWriter = new PrintWriter(fileWriter);
+                        for(int i=0; i<25; i++)
+                        {
+                            printWriter.print(Combined.salesScene.bArr[i].getTitle());
+                            printWriter.print("\t");
+                            printWriter.printf(Double.toString(Combined.salesScene.bArr[i].getPrice()));
+                            printWriter.print("\t");
+                            printWriter.printf(Integer.toString(Combined.salesScene.bArr[i].getQuantity()));
+                            printWriter.print(System.getProperty("line.separator"));
+                        }
+                        printWriter.close();
+                        }
+                        Combined.salesScene.ledgerT.clear();
+                        Combined.salesScene.totalF.setText("0.00");
+                        Combined.salesScene.stotalF.setText("0.00");
+                        Combined.salesScene.taxF.setText("0.00");
+                        pStage.setScene(Combined.salesScene.getScene());
+                    }
             }
         });
         ledger.add(complete,  0,5);
@@ -158,7 +190,7 @@ public class PaymentScene
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Close Program");
-                pStage.setScene(og);
+                pStage.setScene(Combined.salesScene.getScene());
                 //pStage.show();
             }
         });
@@ -198,9 +230,89 @@ public class PaymentScene
                             b.setStyle("-fx-background-color: #008000; ");
                     else if (b.getText().length() > 1)
                             b.setStyle("-fx-background-color: #FF0000; ");
-
+                    
+                    b.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent e) {
+					String buttonText = b.getText();
+					String fieldText = input.getText();
+					if (buttonText.length() == 1) { // Number button
+						fieldText += buttonText;
+						input.setText(fieldText);
+					} else if (buttonText.equals(".")) {
+						fieldText +=buttonText;
+						input.setText(".");
+						input.requestFocus();
+					} else if (input.getText().length() > 0) 
+                                        {
+                                            double outD=Double.parseDouble(totalF.getText());
+                                            double cash=Double.parseDouble(input.getText());
+                                            double left= outD-cash;
+                                            totalF.setText(String.format("%.2f", left));
+                                        }
+                                }
+                    });
+                     
                     numPad.add(b, i%3, (int) Math.ceil(i/3) + 2);
-		}
+
+                }
+                Button exact= new Button("Exact Amount");
+                GridPane.setMargin(exact, new Insets(10,10,10,10));
+                    exact.setEffect(shadow);
+                    exact.setMinWidth(340);
+                    exact.setMinHeight(50);
+                    exact.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent e) {
+					input.setText(totalF.getText());	
+                                }
+                    });
+                    numPad.add(exact,0,6);
+                    numPad.setColumnSpan(exact,3);
+                    
+                Button cc= new Button("Credit");
+                GridPane.setMargin(cc, new Insets(10,10,10,10));
+                    cc.setEffect(shadow);
+                    cc.setMinWidth(340);
+                    cc.setMinHeight(50);
+                    cc.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent e) {
+					JTextField cc = new JTextField();
+                                        JTextField name = new JTextField();
+                                        JTextField cvc = new JTextField();
+                                        JTextField zip = new JTextField();
+                                        JTextField exp = new JTextField();
+                                        Object[] message = {
+                                            "Credit Card #:", cc,
+                                            "CVC:", cvc,
+                                            "Zipcode:", zip,
+                                            "Expiration date (mmyyyy):", exp,
+                                            "Name on Card:",name
+                                        };
+
+                                        int option = JOptionPane.showConfirmDialog(null, message, "Credit Card Info", JOptionPane.OK_CANCEL_OPTION);
+                                        if (option == JOptionPane.OK_OPTION) {
+                                            if (cc.getText()!=null) { //Would add more verification elements
+                                                System.out.println("Card Processed");
+                                                double outD=Double.parseDouble(totalF.getText());
+                                                double cash=Double.parseDouble(input.getText());
+                                                double left= outD-cash;
+                                                totalF.setText(String.format("%.2f", left));
+                                                input.clear();
+                                                
+                                            } else {
+                                                System.out.println("Card Failed");
+                                            }
+                                        } else {
+                                            System.out.println("Payment Canceled");
+                                        }	
+                                }
+                    });
+                    numPad.add(cc,0,7);
+                    numPad.setColumnSpan(cc,3);
+                    
+                    
 		return numPad;
 	}
     

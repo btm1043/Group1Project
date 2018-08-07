@@ -48,9 +48,10 @@ public class SaleScene{
     TextField totalF= new TextField();
     TextField stotalF= new TextField();
     TextField taxF= new TextField();
+    iButton bArr[]=new iButton[25];
     
     LogInScene l= Combined.logInScene;
-    boolean manager=false;
+    boolean manager=true;
     
     public SaleScene(Stage primaryStage, MenuBar menu) 
     {
@@ -130,7 +131,6 @@ public class SaleScene{
                 } catch (IOException ex) {
                     Logger.getLogger(SaleScene.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
                 pStage.setScene(new PaymentScene(pStage,Sscene).getScene());
             }
         });
@@ -162,7 +162,7 @@ public class SaleScene{
         buttonS.setVgap(10);
         buttonS.setGridLinesVisible(true);
         
-        iButton bArr[]=new iButton[25];
+        //iButton bArr[]=new iButton[25];
         int i=0;
         int j=0;
         int k=0;
@@ -261,6 +261,7 @@ public class SaleScene{
                         else
                         {
                             System.out.println("LEDGER");
+                            quantity--;
                             String out=String.format("%s\t$%.2f\n",title,price);
                             double outD=Double.parseDouble(totalF.getText())+price;
                             double taxt=outD*.06;
