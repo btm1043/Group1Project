@@ -938,6 +938,33 @@ public class Database {
 		return entries;
 	}
 	
+	/**
+	 * Function that returns a linked list of each sale entry entered into the Sales table. Stores information about trans id, total spent, payment used, and time of transaction
+	 */
+	public static LinkedList<Sale> getSales() {
+		LinkedList<Sale> sales = new LinkedList<Sale>();
+		try {
+			Connection con = getConnection();
+			String query = "SELECT * FROM sale";
+			PreparedStatement st = con.prepareStatement(query);
+			ResultSet matches = st.executeQuery();
+			if (!matches.next()) {
+				System.out.println("No table found!");
+				return null;
+			}
+			do {
+				sales.add(new Sale(matches.getInt("trans"), matches.getDouble("total"), matches.getString("Payment"), matches.getString("cardnum"), matches.getTimestamp("time")));
+				
+			} while (matches.next());
+			
+			con.close();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+		
+		return sales;
+	}
 	
 	/**
 	 * Helper method to secure connection to DB. 
